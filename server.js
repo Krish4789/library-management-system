@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { connectRedis } = require('./config/redis');
+const connectDB = require('./config/database');
+const userService = require('./services/user-service');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,10 +21,14 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Service routes
+app.use('/api/users', userService);
+
 // Start server
 const startServer = async () => {
   try {
     await connectRedis();
+    await connectDB();
     
     app.listen(PORT, () => {
       console.log(`API Gateway running on port ${PORT}`);
